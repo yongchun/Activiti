@@ -592,7 +592,7 @@ public class DbSqlSession implements Session {
   public void dbSchemaCheckVersion() {
     try {
       String dbVersion = getDbVersion();
-      if (!ProcessEngine.VERSION.equals(dbVersion)) {
+      if (!ProcessEngine.VERSION.equals(dbVersion)) {//数据库ATC_GE_PROPRTY的schema.version与jar包版本不一致，抛出异常
         throw new ActivitiWrongDbException(ProcessEngine.VERSION, dbVersion);
       }
 
@@ -990,7 +990,8 @@ public class DbSqlSession implements Session {
   }
   
   public void performSchemaOperationsProcessEngineBuild() {
-    String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
+    String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();//从配置文件获取beanId为processEngineConfiguration的Bean的databaseSchemaUpdate属性
+    //这里指出的几种模式参考对应的常量
     if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
       try {
         dbSchemaDrop();
@@ -1004,10 +1005,10 @@ public class DbSqlSession implements Session {
        ) {
       dbSchemaCreate();
       
-    } else if (org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-      dbSchemaCheckVersion();
+    } else if (org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {//如果配置文件里databaseSchemaUpdate=false，就会对数据库表ACT_GE_PROPERTY的记录schema.version与jar包版本进行校验
+      dbSchemaCheckVersion();//校验规则
       
-    } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
+    } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {//如果配置文件里databaseSchemaUpdate=true，则以jar包版本为主
       dbSchemaUpdate();
     }
   }
